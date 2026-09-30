@@ -12,9 +12,12 @@ from .excel_manager import ExcelManager
 
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(Path(__file__).resolve().parent / ".env")
+IS_VERCEL = os.getenv("VERCEL") == "1"
+STORAGE_ROOT = Path("/tmp") if IS_VERCEL else ROOT
+DEFAULT_CONFIG = STORAGE_ROOT / "config.json" if IS_VERCEL else ROOT / "backend" / "config.json"
 manager = ExcelManager(
-    Path(os.getenv("BUSINESS_FILE", str(ROOT / "Business.xlsx"))),
-    Path(os.getenv("CONFIG_FILE", str(ROOT / "backend" / "config.json"))),
+    Path(os.getenv("BUSINESS_FILE", str(STORAGE_ROOT / "Business.xlsx"))),
+    Path(os.getenv("CONFIG_FILE", str(DEFAULT_CONFIG))),
 )
 
 app = FastAPI(title="Business Manager API", version="1.0.0")

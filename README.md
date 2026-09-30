@@ -39,6 +39,12 @@ Requirements: Python 3.10+ and Node.js 18+.
 
 The API listens on `http://localhost:8000`; interactive API documentation is at `/docs`. Set `VITE_API_URL` in `frontend/.env` to change the API URL. Workbook and config locations can be changed with `BUSINESS_FILE` and `CONFIG_FILE` in `backend/.env`.
 
+## Vercel deployment
+
+The included `vercel.json` builds the FastAPI function and static frontend, routing `/api/*` to the backend. Set `APP_PASSWORD` in the Vercel project environment variables. The frontend uses same-origin `/api` requests in production.
+
+Vercel's `/tmp` storage is temporary and instance-local. The workbook and config are placed there so the function can start, but Excel changes may disappear after a cold start and are not shared reliably between function instances. Use persistent shared storage for production records, or run the app on a persistent server when `Business.xlsx` must remain the database.
+
 ## API
 
 All routes except `/api/login` and `/api/health` require `Authorization: Bearer <APP_PASSWORD>`.
