@@ -7,7 +7,10 @@ from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from .excel_manager import ExcelManager
+try:
+    from .excel_manager import ExcelManager
+except ImportError:
+    from excel_manager import ExcelManager
 
 
 ROOT = Path(__file__).resolve().parent.parent

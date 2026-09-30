@@ -7,7 +7,10 @@ from typing import Any
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Border, Font, PatternFill, Side
 
-from .formula_engine import FormulaError, calculate_formula
+try:
+    from .formula_engine import FormulaError, calculate_formula
+except ImportError:
+    from formula_engine import FormulaError, calculate_formula
 
 
 DEFAULT_SHEETS = {
