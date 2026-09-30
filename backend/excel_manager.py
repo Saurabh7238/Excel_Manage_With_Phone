@@ -1,6 +1,7 @@
 import json
 from copy import deepcopy
 from datetime import date, datetime
+from io import BytesIO
 from pathlib import Path
 from typing import Any
 
@@ -137,6 +138,46 @@ class ExcelManager:
         fields = self._fields(sheet_name)
         rows = self._read_rows(sheet_name)
         return {"name": sheet_name, "fields": fields, "rows": rows, **self._summary(rows, fields)}
+
+    def import_workbook(self, content: bytes) -> list[dict[str, Any]]:
+        try:
+            workbook = load_workbook(BytesIO(content), data_only=False)
+        except Exception as error:
+            raise ValueError("Upload a valid .xlsx Excel workbook") from error
+        if not workbook.worksheets:
+            raise ValueError("The workbook must contain at least one worksheet")
+
+        sheets = {}
+        for sheet in workbook.worksheets:
+            headers = []
+            for index, cell in enumerate(sheet[1], start=1):
+                value = str(cell.value).strip() if cell.value is not None else ""
+                headers.append(value or f"Column {index}")
+            while headers and headers[-1].startswith("Column ") and sheet.max_column < len(headers):
+                headers.pop()
+            if not headers:
+                raise ValueError(f"Worksheet '{sheet.title}' must have a header row")
+            if len({header.casefold() for header in headers}) != len(headers):
+                raise ValueError(f"Worksheet '{sheet.title}' has duplicate column names")
+            fields = []
+            for column_index, header in enumerate(headers, start=1):
+                values = [sheet.cell(row, column_index).value for row in range(2, sheet.max_row + 1)]
+                fields.append({"name": header, "type": self._infer_field_type(values)})
+            sheets[sheet.title] = fields
+
+        workbook.save(self.workbook_path)
+        self.config = {"sheets": sheets, "styles": {name: {} for name in sheets}}
+        self._save_config()
+        return self.get_lists()
+
+    @staticmethod
+    def _infer_field_type(values: list[Any]) -> str:
+        populated = [value for value in values if value is not None and value != ""]
+        if populated and all(isinstance(value, (datetime, date)) for value in populated):
+            return "date"
+        if populated and all(isinstance(value, (int, float)) and not isinstance(value, bool) for value in populated):
+            return "number"
+        return "text"
 
     def _save_rows(self, sheet_name: str, rows: list[dict[str, Any]]) -> None:
         fields = self._fields(sheet_name)

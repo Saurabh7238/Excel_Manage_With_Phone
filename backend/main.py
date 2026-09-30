@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException
+from fastapi import APIRouter, Depends, FastAPI, File, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -78,6 +78,16 @@ def health():
 @api.get("/lists")
 def get_lists():
     return manager.get_lists()
+
+
+@api.post("/upload")
+async def upload_workbook(file: UploadFile = File(...)):
+    if not file.filename or not file.filename.lower().endswith(".xlsx"):
+        raise HTTPException(status_code=400, detail="Upload an .xlsx Excel workbook")
+    try:
+        return manager.import_workbook(await file.read())
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
 
 
 @api.get("/{sheet_name}/data")

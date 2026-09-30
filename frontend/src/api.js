@@ -13,3 +13,16 @@ export async function api(path, token, options = {}) {
   if (!response.ok) throw new Error(body?.detail || 'Something went wrong. Please try again.')
   return body
 }
+
+export async function uploadWorkbook(file, token) {
+  const form = new FormData()
+  form.append('file', file)
+  const response = await fetch(`${API_URL}/upload`, {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: form,
+  })
+  const body = await response.json().catch(() => null)
+  if (!response.ok) throw new Error(body?.detail || 'Could not upload the workbook.')
+  return body
+}

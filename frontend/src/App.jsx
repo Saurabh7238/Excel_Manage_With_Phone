@@ -3,9 +3,9 @@ import {
   ArrowDownLeft, ArrowUpRight, BadgeIndianRupee, BriefcaseBusiness, CalendarDays,
   Check, ChevronDown, ChevronLeft, CircleHelp, ClipboardList, Clock3, Download,
   FilePlus2, Filter, LayoutDashboard, LoaderCircle, LogOut, Menu, Plus, Search,
-  Settings2, SlidersHorizontal, Sparkles, UsersRound, X,
+  Settings2, SlidersHorizontal, Sparkles, Upload, UsersRound, X,
 } from 'lucide-react'
-import { api } from './api'
+import { api, uploadWorkbook } from './api'
 
 const money = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 })
 const palette = ['#dff4a7', '#e7efec', '#ffe3d8', '#e4e8ff']
@@ -57,6 +57,7 @@ function App() {
   const [screen, setScreen] = useState('home')
   const [modal, setModal] = useState('')
   const [busy, setBusy] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('')
@@ -99,6 +100,22 @@ function App() {
       setToken(result.token)
     } catch (problem) { setError(problem.message) }
     finally { setBusy(false) }
+  }
+
+  async function importWorkbook(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    setUploading(true); setError('')
+    try {
+      const result = await uploadWorkbook(file, token)
+      setLists(result)
+      setActiveList(result[0]?.name || '')
+      setData(null)
+      setScreen('home')
+      showToast(`${file.name} imported`)
+    } catch (problem) { showToast(problem.message) }
+    finally { setUploading(false) }
   }
 
   async function reload() {
@@ -171,7 +188,7 @@ function App() {
         <header className="topbar"><div className="mobile-brand"><span className="brand-symbol">L</span><strong>ledgerly</strong></div><div className="breadcrumb"><span>Workspace</span><span className="crumb-slash">/</span><strong>{screen === 'home' ? 'Overview' : activeList}</strong></div><div className="top-actions"><span className="saved-indicator"><span /> Excel synced</span><button className="avatar-button" title="Sign out" onClick={() => { localStorage.removeItem('ledgerly-token'); setToken('') }}>S</button></div></header>
 
         {screen === 'home' ? <section className="page-content page-enter">
-          <div className="welcome-row"><div><p className="eyebrow">WEDNESDAY, SEPTEMBER 30</p><h1>Good business<br className="mobile-break" /> starts here<span className="title-period">.</span></h1><p className="subheading">A clear view of the work that keeps you moving.</p></div><button className="primary-button create-button" onClick={() => setModal('create')}><Plus size={19} /> Create new list</button></div>
+          <div className="welcome-row"><div><p className="eyebrow">WEDNESDAY, SEPTEMBER 30</p><h1>Good business<br className="mobile-break" /> starts here<span className="title-period">.</span></h1><p className="subheading">A clear view of the work that keeps you moving.</p></div><div className="welcome-actions"><label className="secondary-button upload-button"><Upload size={17} /> {uploading ? 'Importing...' : 'Upload Excel'}<input className="upload-input" type="file" accept=".xlsx" onChange={importWorkbook} disabled={uploading} /></label><button className="primary-button create-button" onClick={() => setModal('create')}><Plus size={19} /> Create new list</button></div></div>
           <div className="overview-strip"><div className="overview-stat"><span className="stat-icon sage"><ClipboardList size={18} /></span><div><span>ACTIVE LISTS</span><strong>{lists.length.toString().padStart(2, '0')}</strong></div></div><div className="strip-divider" /><div className="overview-stat"><span className="stat-icon coral-bg"><ArrowUpRight size={18} /></span><div><span>RECORDS TRACKED</span><strong>{lists.reduce((sum, list) => sum + list.count, 0).toLocaleString('en-IN')}</strong></div></div><div className="strip-divider" /><div className="overview-stat"><span className="stat-icon lilac"><BadgeIndianRupee size={18} /></span><div><span>NUMBER TOTALS</span><strong>₹{money.format(dashboardTotal)}</strong></div></div><div className="strip-aside"><Sparkles size={16} /><span>Everything in its place.</span></div></div>
           <div className="section-heading"><div><p className="eyebrow">YOUR BUSINESS</p><h2>Lists & records</h2></div><span className="list-count-label">{lists.length} LISTS</span></div>
           <div className="dashboard-grid">{lists.map((list, index) => {

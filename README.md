@@ -8,6 +8,7 @@ A mobile-first business tracker with a React + Tailwind interface and a FastAPI 
 - Mobile-friendly record cards with search, status filtering, and list summaries.
 - Dynamic add-record forms, including dropdowns, dates, numbers, and read-only formula fields.
 - Create lists and add, rename, or delete fields from Manage fields.
+- Upload an `.xlsx` workbook from the dashboard; each worksheet becomes a manageable list with its headers and rows imported.
 - Per-column bold, italic, underline, font size, text color, background color, and border styling, applied to the workbook with `openpyxl`.
 - Formula fields support arithmetic, `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT`, and `IF`. Use square brackets for field names containing spaces, for example `[Unit Price] * Quantity`.
 - Password-based API access.
@@ -50,6 +51,7 @@ Vercel's `/tmp` storage is temporary and instance-local. The workbook and config
 All routes except `/api/login` and `/api/health` require `Authorization: Bearer <APP_PASSWORD>`.
 
 - `GET /api/lists`
+- `POST /api/upload` with an `.xlsx` multipart file; replaces the managed workbook with the uploaded worksheets.
 - `GET /api/{sheet_name}/data`
 - `POST /api/{sheet_name}/add-row` with `{ "values": { ... } }`
 - `POST /api/{sheet_name}/add-field`
