@@ -2,19 +2,15 @@
   "version": 2,
   "services": {
     "api": {
-      "builds": {
-        "root": "backend"
-      }
+      "root": "backend"
     },
     "web": {
-      "builds": {
-        "root": "frontend"
-      },
+      "root": "frontend",
       "framework": "vite"
     }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" },
-    { "source": "/(.*)", "destination": "/web" }
+    { "source": "/api/(.*)", "destination": { "service": "api" } },
+    { "source": "/(.*)", "destination": { "service": "web" } }
   ]
 }
