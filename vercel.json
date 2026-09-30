@@ -2,7 +2,8 @@
   "version": 2,
   "services": {
     "api": {
-      "root": "backend"
+      "root": "backend",
+      "entrypoint": "main:app"
     },
     "web": {
       "root": "frontend",
