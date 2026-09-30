@@ -1,0 +1,92 @@
+{
+  "sheets": {
+    "Attendance": [
+      {
+        "name": "Name",
+        "type": "text"
+      },
+      {
+        "name": "Date",
+        "type": "date"
+      },
+      {
+        "name": "Status",
+        "type": "dropdown",
+        "options": [
+          "Present",
+          "Absent",
+          "Leave"
+        ]
+      },
+      {
+        "name": "Notes",
+        "type": "text"
+      }
+    ],
+    "Payment Record": [
+      {
+        "name": "Customer",
+        "type": "text"
+      },
+      {
+        "name": "Date",
+        "type": "date"
+      },
+      {
+        "name": "Bill",
+        "type": "number"
+      },
+      {
+        "name": "Paid",
+        "type": "number"
+      },
+      {
+        "name": "Balance",
+        "type": "formula",
+        "formula": "Bill - Paid"
+      }
+    ],
+    "Company Details": [
+      {
+        "name": "Company",
+        "type": "text"
+      },
+      {
+        "name": "Contact",
+        "type": "text"
+      },
+      {
+        "name": "Phone",
+        "type": "text"
+      },
+      {
+        "name": "Email",
+        "type": "text"
+      }
+    ],
+    "Follow Up": [
+      {
+        "name": "Customer",
+        "type": "text"
+      },
+      {
+        "name": "Due Date",
+        "type": "date"
+      },
+      {
+        "name": "Status",
+        "type": "dropdown",
+        "options": [
+          "Pending",
+          "Done",
+          "Reschedule"
+        ]
+      },
+      {
+        "name": "Notes",
+        "type": "text"
+      }
+    ]
+  },
+  "styles": {}
+}

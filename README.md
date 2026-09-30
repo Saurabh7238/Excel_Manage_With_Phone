@@ -1,0 +1,52 @@
+# Ledgerly Business Manager
+
+A mobile-first business tracker with a React + Tailwind interface and a FastAPI backend. Records are stored in `Business.xlsx`; list schemas and column formatting are stored in `backend/config.json`.
+
+## Features
+
+- Dashboard cards with record counts and numeric totals for Attendance, Payment Record, Company Details, and Follow Up.
+- Mobile-friendly record cards with search, status filtering, and list summaries.
+- Dynamic add-record forms, including dropdowns, dates, numbers, and read-only formula fields.
+- Create lists and add, rename, or delete fields from Manage fields.
+- Per-column bold, italic, underline, font size, text color, background color, and border styling, applied to the workbook with `openpyxl`.
+- Formula fields support arithmetic, `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT`, and `IF`. Use square brackets for field names containing spaces, for example `[Unit Price] * Quantity`.
+- Password-based API access.
+
+## Run locally
+
+Requirements: Python 3.10+ and Node.js 18+.
+
+1. From the repository root, create `backend/.env` from `backend/.env.example` and set `APP_PASSWORD`.
+2. Install and start the API:
+
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   uvicorn backend.main:app --reload
+   ```
+
+   The first start creates `Business.xlsx` with the four default sheets and creates `backend/config.json`.
+3. In another terminal, start the frontend:
+
+   ```powershell
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+4. Open the Vite URL (normally `http://localhost:5173`) and sign in with `APP_PASSWORD`.
+
+The API listens on `http://localhost:8000`; interactive API documentation is at `/docs`. Set `VITE_API_URL` in `frontend/.env` to change the API URL. Workbook and config locations can be changed with `BUSINESS_FILE` and `CONFIG_FILE` in `backend/.env`.
+
+## API
+
+All routes except `/api/login` and `/api/health` require `Authorization: Bearer <APP_PASSWORD>`.
+
+- `GET /api/lists`
+- `GET /api/{sheet_name}/data`
+- `POST /api/{sheet_name}/add-row` with `{ "values": { ... } }`
+- `POST /api/{sheet_name}/add-field`
+- `PUT|DELETE /api/{sheet_name}/fields/{field_name}`
+- `POST /api/{sheet_name}/create` with `{ "name": "...", "fields": [...] }`
+- `PUT /api/{sheet_name}/styles`
